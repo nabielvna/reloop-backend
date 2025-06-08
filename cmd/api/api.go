@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"reloop-backend/internal/store"
@@ -18,6 +19,7 @@ type application struct {
 type config struct {
 	addr string
 	db 		dbConfig
+	jwtSecret string
 }
 
 type dbConfig struct {
@@ -39,6 +41,35 @@ func (app *application) mount() *chi.Mux {
 
 	r.Route("/v1", func(r chi.Router)  {
 		r.Get("/health", app.healthCheckHandler)
+
+		r.Post("/users/register", app.registerUserHandler)
+        r.Post("/users/login", app.loginUserHandler)
+
+		// Rute untuk otentikasi
+		r.Group(func(r chi.Router) {
+			// Gunakan authMiddleware untuk rute yang memerlukan otentikasi
+			r.Use(app.authMiddleware)
+
+			// Rute-rute yang memerlukan otentikasi
+			r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
+				// Ambil userID dari context yang sudah di-set oleh middleware
+				userID, ok := r.Context().Value(userContextKey).(uint)
+				if !ok {
+					http.Error(w, "Gagal mendapatkan user dari context", http.StatusInternalServerError)
+					return
+				}
+
+				// Sekarang Anda punya userID dan bisa mengambil data user dari database
+				user, err := app.store.Users.(*store.UsersStore).GetByID(r.Context(), userID)
+				if err != nil {
+					http.Error(w, "User tidak ditemukan", http.StatusNotFound)
+					return
+				}
+				
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(user)
+			})
+		})
 	})
 
 	return r

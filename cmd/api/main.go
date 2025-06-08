@@ -24,6 +24,7 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
+		jwtSecret: env.GetString("JWT_SECRET", "secret"),
 	}
 
 	db, err := db.New(
@@ -34,6 +35,12 @@ func main() {
 	)
 
 	db.AutoMigrate(
+		&models.Admin{},
+		&models.Category{},
+		&models.FraudReport{},
+		&models.Item{},
+		&models.ProductReview{},
+		&models.Seller{},
 		&models.User{},
 	)
 
