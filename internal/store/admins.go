@@ -1,10 +1,13 @@
 package store
 
-import "github.com/lib/pq"
+import "gorm.io/gorm"
 
-type Admin struct {
-	UserID      uint           `gorm:"primaryKey"`
-	Permissions pq.StringArray `gorm:"type:text[]"`
+type AdminsStore struct {
+	db *gorm.DB
+}
 
-	User *User `gorm:"foreignKey:UserID"`
+func NewAdminsStore(db *gorm.DB) *AdminsStore {
+	return &AdminsStore{
+		db: db,
+	}
 }

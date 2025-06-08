@@ -4,6 +4,7 @@ import (
 	"log"
 	"reloop-backend/internal/db"
 	"reloop-backend/internal/env"
+	"reloop-backend/internal/models"
 	"reloop-backend/internal/store"
 
 	"github.com/joho/godotenv"
@@ -33,7 +34,7 @@ func main() {
 	)
 
 	db.AutoMigrate(
-		&store.User{},
+		&models.User{},
 	)
 
 	if err != nil {

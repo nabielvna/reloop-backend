@@ -2,13 +2,14 @@ package store
 
 import (
 	"context"
+	"reloop-backend/internal/models"
 
 	"gorm.io/gorm"
 )
 
 type Storage struct {
 	Users interface {
-		Create(context.Context, *User) error
+		Create(context.Context, *models.User) error
 	}
 }
 

@@ -2,13 +2,12 @@ package store
 
 import "gorm.io/gorm"
 
-type FraudReport struct {
-	gorm.Model
-	ReporterID     *uint
-	ReportedItemID *uint
-	ReportDetails  string `gorm:"not null"`
-	Status         string `gorm:"type:varchar(20);not null;default:submitted"`
+type FraudReportsStore struct {
+	db *gorm.DB
+}
 
-	Reporter     *User `gorm:"foreignKey:ReporterID"`
-	ReportedItem *Item `gorm:"foreignKey:ReportedItemID"`
+func NewFraudReportsStore(db *gorm.DB) *FraudReportsStore {
+	return &FraudReportsStore{
+		db: db,
+	}
 }
