@@ -43,8 +43,9 @@ func main() {
 	log.Printf("→ DB_ADDR = %s\n", cfg.db.addr)
 	log.Println("Koneksi ke database berhasil")
 
-	// Use new storage with repository pattern
-	store := store.NewStorage()
+	// Use new storage with repository pattern and facades
+	// ✅ UPDATED: Pass jwtSecret to storage
+	store := store.NewStorage(cfg.jwtSecret)
 
 	app := &application{
 		config: cfg,
