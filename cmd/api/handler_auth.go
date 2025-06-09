@@ -77,9 +77,9 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 
 	claims := jwt.MapClaims{
 		"sub": user.ID,
-		"rol": user.Role,    
-		"iat": time.Now().Unix(), 
-		"exp": time.Now().Add(time.Hour * 24).Unix(), 
+		"rol": user.Role,
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

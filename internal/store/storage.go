@@ -1,20 +1,24 @@
 package store
 
 import (
-	"context"
-	"reloop-backend/internal/models"
-
-	"gorm.io/gorm"
+	"reloop-backend/internal/repositories/implementations"
+	"reloop-backend/internal/repositories/interfaces"
 )
 
 type Storage struct {
-	Users interface {
-		Create(context.Context, *models.User) error
-	}
+	Users        interfaces.UserRepositoryInterface
+	Items        interfaces.ItemRepositoryInterface
+	Categories   interfaces.CategoryRepositoryInterface
+	Sellers      interfaces.SellerRepositoryInterface
+	FraudReports interfaces.FraudReportRepositoryInterface
 }
 
-func NewStorage(db *gorm.DB) Storage {
+func NewStorage() Storage {
 	return Storage{
-		Users: &UsersStore{db},
+		Users:        implementations.NewUserRepository(),
+		Items:        implementations.NewItemRepository(),
+		Categories:   implementations.NewCategoryRepository(),
+		Sellers:      implementations.NewSellerRepository(),
+		FraudReports: implementations.NewFraudReportRepository(),
 	}
 }
