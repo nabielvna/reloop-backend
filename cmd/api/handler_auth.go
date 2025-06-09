@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"reloop-backend/internal/models"
-	"reloop-backend/internal/store"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -59,7 +58,8 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	user, err := app.store.Users.(*store.UsersStore).GetByEmail(r.Context(), input.Email)
+	// ✅ FIX: Gunakan interface method langsung tanpa type assertion
+	user, err := app.store.Users.GetByEmail(r.Context(), input.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, "Email atau password salah", http.StatusUnauthorized)

@@ -12,13 +12,13 @@ import (
 )
 
 type application struct {
-	config 	config
-	store 	store.Storage
+	config config
+	store  store.Storage
 }
 
 type config struct {
-	addr string
-	db 		dbConfig
+	addr      string
+	db        dbConfig
 	jwtSecret string
 }
 
@@ -36,36 +36,30 @@ func (app *application) mount() *chi.Mux {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	
+
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Route("/v1", func(r chi.Router)  {
+	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
 
 		r.Post("/users/register", app.registerUserHandler)
-        r.Post("/users/login", app.loginUserHandler)
+		r.Post("/users/login", app.loginUserHandler)
 
 		// Rute untuk otentikasi
 		r.Group(func(r chi.Router) {
-			// Gunakan authMiddleware untuk rute yang memerlukan otentikasi
 			r.Use(app.authMiddleware)
-
-			// Rute-rute yang memerlukan otentikasi
 			r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
-				// Ambil userID dari context yang sudah di-set oleh middleware
 				userID, ok := r.Context().Value(userContextKey).(uint)
 				if !ok {
 					http.Error(w, "Gagal mendapatkan user dari context", http.StatusInternalServerError)
 					return
 				}
-
-				// Sekarang Anda punya userID dan bisa mengambil data user dari database
-				user, err := app.store.Users.(*store.UsersStore).GetByID(r.Context(), userID)
+				user, err := app.store.Users.GetByID(r.Context(), userID)
 				if err != nil {
 					http.Error(w, "User tidak ditemukan", http.StatusNotFound)
 					return
 				}
-				
+
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(user)
 			})
@@ -78,11 +72,11 @@ func (app *application) mount() *chi.Mux {
 func (app *application) run(mux *chi.Mux) error {
 
 	srv := &http.Server{
-		Addr: app.config.addr,
-		Handler: mux,
+		Addr:         app.config.addr,
+		Handler:      mux,
 		WriteTimeout: time.Second * 30,
-		ReadTimeout: time.Second * 10,
-		IdleTimeout: time.Minute,
+		ReadTimeout:  time.Second * 10,
+		IdleTimeout:  time.Minute,
 	}
 
 	log.Printf("Starting server on %s", app.config.addr)
