@@ -12,13 +12,14 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  .env file tidak ditemukan, lanjut dengan env vars sistem atau fallback")
+		log.Println(" .env file tidak ditemukan, lanjut dengan env vars sistem atau fallback")
 	}
 
 	cfg := config{
 		addr: env.GetString("ADDR", ":8080"),
 		db: dbConfig{
-			addr:         env.GetString("DB_ADDR", "postgres://postgres:1234@localhost:5432/reloop?sslmode=disable"),
+			// pass : rafael2005
+			addr:         env.GetString("DB_ADDR", "postgres://postgres:rafael2005@localhost:5432/reloop?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
@@ -29,8 +30,8 @@ func main() {
 	// Initialize database singleton
 	db := services.GetDatabase().GetDB()
 
-	// Auto migrate
-	db.AutoMigrate(
+	// Auto migrate with better error handling
+	err := db.AutoMigrate(
 		&models.Admin{},
 		&models.Category{},
 		&models.FraudReport{},
@@ -39,12 +40,12 @@ func main() {
 		&models.Seller{},
 		&models.User{},
 	)
+	if err != nil {
+		log.Fatalf(" Migration failed: %v", err)
+	}
 
 	log.Printf("→ DB_ADDR = %s\n", cfg.db.addr)
 	log.Println("Koneksi ke database berhasil")
-
-	// Use new storage with repository pattern and facades
-	// ✅ UPDATED: Pass jwtSecret to storage
 	store := store.NewStorage(cfg.jwtSecret)
 
 	app := &application{
@@ -53,5 +54,6 @@ func main() {
 	}
 
 	mux := app.mount()
+	log.Printf("🚀 Server starting on %s", cfg.addr)
 	log.Fatal(app.run(mux))
 }

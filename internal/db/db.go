@@ -3,13 +3,13 @@ package db
 import (
 	"time"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func New(addr string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*gorm.DB, error) {
-	// For SQLite, addr is the file path
-	db, err := gorm.Open(sqlite.Open(addr), &gorm.Config{})
+func New(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*gorm.DB, error) {
+	// Pakai POSTGRESQL
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
