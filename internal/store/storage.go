@@ -4,29 +4,27 @@ import (
 	"reloop-backend/internal/facades"
 	"reloop-backend/internal/repositories/implementations"
 	"reloop-backend/internal/repositories/interfaces"
+
+	"gorm.io/gorm"
 )
 
 type Storage struct {
-	// Repositories
 	Users        interfaces.UserRepositoryInterface
 	Items        interfaces.ItemRepositoryInterface
 	Categories   interfaces.CategoryRepositoryInterface
 	Sellers      interfaces.SellerRepositoryInterface
 	FraudReports interfaces.FraudReportRepositoryInterface
 
-	// Facades
 	Facades facades.FacadeStorage
 }
 
-func NewStorage(jwtSecret string) Storage {
-	// Create repositories
-	userRepo := implementations.NewUserRepository()
-	itemRepo := implementations.NewItemRepository()
-	categoryRepo := implementations.NewCategoryRepository()
-	sellerRepo := implementations.NewSellerRepository()
-	fraudRepo := implementations.NewFraudReportRepository()
+func NewStorage(db *gorm.DB, jwtSecret string) *Storage {
+	userRepo := implementations.NewUserRepository(db)
+	itemRepo := implementations.NewItemRepository(db)
+	categoryRepo := implementations.NewCategoryRepository(db)
+	sellerRepo := implementations.NewSellerRepository(db)
+	fraudRepo := implementations.NewFraudReportRepository(db)
 
-	// Create facades
 	facadeStorage := facades.NewFacadeStorage(
 		userRepo,
 		itemRepo,
@@ -35,7 +33,7 @@ func NewStorage(jwtSecret string) Storage {
 		jwtSecret,
 	)
 
-	return Storage{
+	return &Storage{
 		Users:        userRepo,
 		Items:        itemRepo,
 		Categories:   categoryRepo,

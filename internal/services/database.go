@@ -16,15 +16,16 @@ var (
 	once       sync.Once
 )
 
-func GetDatabase() *DatabaseManager {
+func GetDatabase(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime string) *DatabaseManager {
 	once.Do(func() {
-		// SQLite database file
 		database, err := db.New(
-			"./database/reloop.db", // SQLite file path
-			30, 30, "15m",
+			dsn,
+			maxOpenConns,
+			maxIdleConns,
+			maxIdleTime,
 		)
 		if err != nil {
-			panic("Failed to connect to database")
+			panic("Failed to connect to database: " + err.Error())
 		}
 		dbInstance = &DatabaseManager{db: database}
 	})

@@ -4,7 +4,6 @@ import (
 	"context"
 	"reloop-backend/internal/models"
 	"reloop-backend/internal/repositories/interfaces"
-	"reloop-backend/internal/services"
 
 	"gorm.io/gorm"
 )
@@ -13,8 +12,7 @@ type FraudReportRepository struct {
 	db *gorm.DB
 }
 
-func NewFraudReportRepository() interfaces.FraudReportRepositoryInterface {
-	db := services.GetDatabase().GetDB()
+func NewFraudReportRepository(db *gorm.DB) interfaces.FraudReportRepositoryInterface {
 	return &FraudReportRepository{db: db}
 }
 

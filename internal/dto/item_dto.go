@@ -16,6 +16,10 @@ type UpdateItemRequest struct {
 	Quantity    *int     `json:"quantity,omitempty"`
 }
 
+type UpdateItemStatusRequest struct {
+	Status *string `json:"status"`
+}
+
 type ItemResponse struct {
 	ID          uint             `json:"id"`
 	Name        string           `json:"name"`

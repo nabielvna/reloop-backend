@@ -4,7 +4,6 @@ import (
 	"context"
 	"reloop-backend/internal/models"
 	"reloop-backend/internal/repositories/interfaces"
-	"reloop-backend/internal/services"
 
 	"gorm.io/gorm"
 )
@@ -13,8 +12,7 @@ type CategoryRepository struct {
 	db *gorm.DB
 }
 
-func NewCategoryRepository() interfaces.CategoryRepositoryInterface {
-	db := services.GetDatabase().GetDB()
+func NewCategoryRepository(db *gorm.DB) interfaces.CategoryRepositoryInterface {
 	return &CategoryRepository{db: db}
 }
 

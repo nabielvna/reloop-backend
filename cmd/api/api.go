@@ -7,11 +7,15 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	_ "reloop-backend/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type application struct {
 	config config
-	store  store.Storage
+	store  *store.Storage
 }
 
 type config struct {
@@ -35,6 +39,8 @@ func (app *application) mount() *chi.Mux {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)

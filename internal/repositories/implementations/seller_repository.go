@@ -4,7 +4,8 @@ import (
 	"context"
 	"reloop-backend/internal/models"
 	"reloop-backend/internal/repositories/interfaces"
-	"reloop-backend/internal/services"
+
+	// "reloop-backend/internal/services" // Hapus ini
 
 	"gorm.io/gorm"
 )
@@ -13,8 +14,7 @@ type SellerRepository struct {
 	db *gorm.DB
 }
 
-func NewSellerRepository() interfaces.SellerRepositoryInterface {
-	db := services.GetDatabase().GetDB()
+func NewSellerRepository(db *gorm.DB) interfaces.SellerRepositoryInterface {
 	return &SellerRepository{db: db}
 }
 

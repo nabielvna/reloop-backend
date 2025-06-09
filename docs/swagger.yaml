@@ -1,0 +1,659 @@
+basePath: /v1
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  reloop-backend_internal_dto.CreateItemRequest:
+    properties:
+      categoryId:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  reloop-backend_internal_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  reloop-backend_internal_dto.LoginResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/reloop-backend_internal_dto.UserResponse'
+    type: object
+  reloop-backend_internal_dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      userName:
+        type: string
+    type: object
+  reloop-backend_internal_dto.UpdateItemRequest:
+    properties:
+      categoryId:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  reloop-backend_internal_dto.UpdateItemStatusRequest:
+    properties:
+      status:
+        type: string
+    type: object
+  reloop-backend_internal_dto.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+      userName:
+        type: string
+    type: object
+  reloop-backend_internal_models.Admin:
+    properties:
+      permissions:
+        items:
+          type: string
+        type: array
+      user:
+        $ref: '#/definitions/reloop-backend_internal_models.User'
+      userID:
+        type: integer
+    type: object
+  reloop-backend_internal_models.Category:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      isActive:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.Item'
+        type: array
+      name:
+        type: string
+      parentCategory:
+        $ref: '#/definitions/reloop-backend_internal_models.Category'
+      parentCategoryID:
+        type: integer
+      subCategories:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.Category'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  reloop-backend_internal_models.FraudReport:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      reportDetails:
+        type: string
+      reportedItem:
+        $ref: '#/definitions/reloop-backend_internal_models.Item'
+      reportedItemID:
+        type: integer
+      reporter:
+        $ref: '#/definitions/reloop-backend_internal_models.User'
+      reporterID:
+        type: integer
+      status:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  reloop-backend_internal_models.Item:
+    properties:
+      category:
+        $ref: '#/definitions/reloop-backend_internal_models.Category'
+      categoryID:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      fraudReports:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.FraudReport'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      productReviews:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.ProductReview'
+        type: array
+      quantity:
+        type: integer
+      seller:
+        $ref: '#/definitions/reloop-backend_internal_models.Seller'
+      sellerID:
+        type: integer
+      status:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  reloop-backend_internal_models.ProductReview:
+    properties:
+      comment:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      item:
+        $ref: '#/definitions/reloop-backend_internal_models.Item'
+      itemID:
+        type: integer
+      rating:
+        type: integer
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/reloop-backend_internal_models.User'
+      userID:
+        type: integer
+    type: object
+  reloop-backend_internal_models.Seller:
+    properties:
+      accountStatus:
+        type: string
+      businessName:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.Item'
+        type: array
+      profilePictureURL:
+        type: string
+      user:
+        $ref: '#/definitions/reloop-backend_internal_models.User'
+      userID:
+        type: integer
+      verificationStatus:
+        type: string
+      whatsappLink:
+        type: string
+      whatsappNumber:
+        type: string
+    type: object
+  reloop-backend_internal_models.User:
+    properties:
+      admin:
+        $ref: '#/definitions/reloop-backend_internal_models.Admin'
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      fraudReports:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.FraudReport'
+        type: array
+      id:
+        type: integer
+      passwordHash:
+        type: string
+      productReviews:
+        items:
+          $ref: '#/definitions/reloop-backend_internal_models.ProductReview'
+        type: array
+      role:
+        type: string
+      seller:
+        $ref: '#/definitions/reloop-backend_internal_models.Seller'
+      updatedAt:
+        type: string
+      userName:
+        type: string
+    type: object
+  reloop-backend_internal_views.APIError:
+    properties:
+      code:
+        type: string
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  reloop-backend_internal_views.APIResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/reloop-backend_internal_views.APIError'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Ini adalah dokumentasi API untuk backend Reloop.
+  title: Reloop API
+  version: "1.0"
+paths:
+  /admin/items/{itemID}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Mengubah status sebuah item. Hanya bisa diakses oleh Admin.
+      parameters:
+      - description: ID Item
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      - description: Status baru untuk item
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reloop-backend_internal_dto.UpdateItemStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status item berhasil diperbarui
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "400":
+          description: Request atau ID item tidak valid
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "403":
+          description: Akses ditolak (bukan admin)
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Memperbarui status item (Admin)
+      tags:
+      - Admin
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Mengautentikasi pengguna dengan email dan password, dan mengembalikan
+        token JWT jika berhasil.
+      parameters:
+      - description: Kredensial untuk login
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/reloop-backend_internal_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login berhasil
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/reloop-backend_internal_dto.LoginResponse'
+              type: object
+        "400":
+          description: Request tidak valid
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "401":
+          description: Kredensial tidak valid
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      summary: Login pengguna
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Membuat akun pengguna baru dengan memberikan detail yang diperlukan.
+      parameters:
+      - description: Payload untuk registrasi pengguna
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reloop-backend_internal_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Pengguna berhasil diregistrasi
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/reloop-backend_internal_models.User'
+              type: object
+        "400":
+          description: Request tidak valid atau validasi gagal
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      summary: Registrasi pengguna baru
+      tags:
+      - Auth
+  /items:
+    get:
+      description: Endpoint publik untuk mencari dan memfilter item berdasarkan kriteria.
+      parameters:
+      - description: Filter berdasarkan ID kategori
+        in: query
+        name: categoryId
+        type: integer
+      - description: Filter harga minimum
+        in: query
+        name: minPrice
+        type: number
+      - description: Filter harga maksimum
+        in: query
+        name: maxPrice
+        type: number
+      - description: Kata kunci pencarian pada nama atau deskripsi
+        in: query
+        name: search
+        type: string
+      - description: Filter berdasarkan status (e.g., 'approved')
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/reloop-backend_internal_models.Item'
+                  type: array
+              type: object
+        "500":
+          description: Gagal mencari item
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      summary: Mencari dan memfilter item
+      tags:
+      - Items
+    post:
+      consumes:
+      - application/json
+      description: Membuat produk atau item baru. Hanya dapat diakses oleh pengguna
+        yang sudah login (penjual).
+      parameters:
+      - description: Data untuk membuat item baru
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reloop-backend_internal_dto.CreateItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Item berhasil dibuat
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/reloop-backend_internal_models.Item'
+              type: object
+        "400":
+          description: Request tidak valid atau validasi gagal
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "500":
+          description: Gagal mengambil pengguna dari konteks
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Membuat item baru
+      tags:
+      - Items
+  /items/{itemID}:
+    delete:
+      description: Menghapus sebuah item. Hanya bisa dilakukan oleh pemilik item.
+      parameters:
+      - description: ID Item
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item berhasil dihapus
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "400":
+          description: ID item tidak valid
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "403":
+          description: Akses ditolak (bukan pemilik item)
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "404":
+          description: Item tidak ditemukan
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Menghapus item
+      tags:
+      - Items
+    get:
+      description: Endpoint publik untuk mengambil detail spesifik dari sebuah item
+        berdasarkan ID-nya.
+      parameters:
+      - description: ID Item
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/reloop-backend_internal_models.Item'
+              type: object
+        "400":
+          description: ID item tidak valid
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "404":
+          description: Item tidak ditemukan
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      summary: Mendapatkan detail item
+      tags:
+      - Items
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui detail item. Hanya bisa dilakukan oleh pemilik item.
+      parameters:
+      - description: ID Item
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      - description: Data item yang akan diperbarui
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reloop-backend_internal_dto.UpdateItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item berhasil diperbarui
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/reloop-backend_internal_models.Item'
+              type: object
+        "400":
+          description: Request atau ID item tidak valid
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "403":
+          description: Akses ditolak (bukan pemilik item)
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "404":
+          description: Item tidak ditemukan
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Memperbarui item
+      tags:
+      - Items
+  /me:
+    get:
+      description: Mengambil detail profil untuk pengguna yang sedang login (memerlukan
+        token otentikasi).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profil berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/reloop-backend_internal_models.User'
+              type: object
+        "401":
+          description: Unauthorized (token tidak valid atau tidak ada)
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "404":
+          description: Pengguna tidak ditemukan
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "500":
+          description: Gagal mengambil pengguna dari konteks
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan profil pengguna
+      tags:
+      - Users
+  /my-items:
+    get:
+      description: Mengambil daftar semua item yang dimiliki oleh penjual yang sedang
+        login.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item berhasil diambil
+          schema:
+            allOf:
+            - $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/reloop-backend_internal_models.Item'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+        "500":
+          description: Gagal mengambil item
+          schema:
+            $ref: '#/definitions/reloop-backend_internal_views.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan item milik penjual
+      tags:
+      - Items
+securityDefinitions:
+  BearerAuth:
+    description: Ketik "Bearer" diikuti spasi dan token JWT Anda.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -4,7 +4,6 @@ import (
 	"context"
 	"reloop-backend/internal/models"
 	"reloop-backend/internal/repositories/interfaces"
-	"reloop-backend/internal/services"
 
 	"gorm.io/gorm"
 )
@@ -13,8 +12,7 @@ type ItemRepository struct {
 	db *gorm.DB
 }
 
-func NewItemRepository() interfaces.ItemRepositoryInterface {
-	db := services.GetDatabase().GetDB()
+func NewItemRepository(db *gorm.DB) interfaces.ItemRepositoryInterface {
 	return &ItemRepository{db: db}
 }
 
@@ -51,7 +49,6 @@ func (r *ItemRepository) Browse(ctx context.Context, filters interfaces.ItemFilt
 		Preload("Seller.User").
 		Preload("Category")
 
-	// Apply filters
 	if filters.CategoryID != nil {
 		query = query.Where("category_id = ?", *filters.CategoryID)
 	}

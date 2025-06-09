@@ -1,3 +1,15 @@
+// @title Reloop API
+// @version 1.0
+// @description Ini adalah dokumentasi API untuk backend Reloop.
+
+// @host localhost:8080
+// @BasePath /v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Ketik "Bearer" diikuti spasi dan token JWT Anda.
+
 package main
 
 import (
@@ -26,10 +38,13 @@ func main() {
 		jwtSecret: env.GetString("JWT_SECRET", "secret"),
 	}
 
-	// Initialize database singleton
-	db := services.GetDatabase().GetDB()
+	db := services.GetDatabase(
+		cfg.db.addr,
+		cfg.db.maxOpenConns,
+		cfg.db.maxIdleConns,
+		cfg.db.maxIdleTime,
+	).GetDB()
 
-	// Auto migrate
 	db.AutoMigrate(
 		&models.Admin{},
 		&models.Category{},
@@ -43,15 +58,14 @@ func main() {
 	log.Printf("→ DB_ADDR = %s\n", cfg.db.addr)
 	log.Println("Koneksi ke database berhasil")
 
-	// Use new storage with repository pattern and facades
-	// ✅ UPDATED: Pass jwtSecret to storage
-	store := store.NewStorage(cfg.jwtSecret)
+	store := store.NewStorage(db, cfg.jwtSecret)
 
 	app := &application{
 		config: cfg,
 		store:  store,
 	}
 
+	log.Printf("Menjalankan server di %s", cfg.addr)
 	mux := app.mount()
 	log.Fatal(app.run(mux))
 }

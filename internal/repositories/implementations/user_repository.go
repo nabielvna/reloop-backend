@@ -4,7 +4,6 @@ import (
 	"context"
 	"reloop-backend/internal/models"
 	"reloop-backend/internal/repositories/interfaces"
-	"reloop-backend/internal/services"
 
 	"gorm.io/gorm"
 )
@@ -13,8 +12,7 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository() interfaces.UserRepositoryInterface {
-	db := services.GetDatabase().GetDB()
+func NewUserRepository(db *gorm.DB) interfaces.UserRepositoryInterface {
 	return &UserRepository{db: db}
 }
 
@@ -59,6 +57,5 @@ func (r *UserRepository) UpdateRole(ctx context.Context, id uint, role string) e
 }
 
 func (r *UserRepository) UpdateStatus(ctx context.Context, id uint, status string) error {
-	// Note: User model doesn't have status field, but we'll add it if needed
 	return r.db.WithContext(ctx).Model(&models.User{}).Where("id = ?", id).Update("status", status).Error
 }

@@ -3,13 +3,12 @@ package db
 import (
 	"time"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func New(addr string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*gorm.DB, error) {
-	// For SQLite, addr is the file path
-	db, err := gorm.Open(sqlite.Open(addr), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(addr), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
