@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 	"reloop-backend/internal/store"
 	"time"
@@ -36,32 +34,36 @@ func (app *application) mount() *chi.Mux {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
 
-		r.Post("/users/register", app.registerUserHandler)
-		r.Post("/users/login", app.loginUserHandler)
+		// Public routes
+		r.Post("/auth/register", app.registerUserHandler)
+		r.Post("/auth/login", app.loginUserHandler)
 
-		// Rute untuk otentikasi
+		// Public item browsing
+		r.Get("/items", app.browseItemsHandler)
+		r.Get("/items/{itemID}", app.getItemHandler)
+
+		// Protected routes
 		r.Group(func(r chi.Router) {
 			r.Use(app.authMiddleware)
-			r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
-				userID, ok := r.Context().Value(userContextKey).(uint)
-				if !ok {
-					http.Error(w, "Gagal mendapatkan user dari context", http.StatusInternalServerError)
-					return
-				}
-				user, err := app.store.Users.GetByID(r.Context(), userID)
-				if err != nil {
-					http.Error(w, "User tidak ditemukan", http.StatusNotFound)
-					return
-				}
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(user)
+			// User profile
+			r.Get("/me", app.getUserProfileHandler)
+
+			// Item management (for sellers)
+			r.Post("/items", app.createItemHandler)
+			r.Get("/my-items", app.getMyItemsHandler)
+			r.Put("/items/{itemID}", app.updateItemHandler)
+			r.Delete("/items/{itemID}", app.deleteItemHandler)
+
+			// Admin only routes
+			r.Route("/admin", func(r chi.Router) {
+				// TODO: Add admin middleware
+				r.Patch("/items/{itemID}/status", app.updateItemStatusHandler)
 			})
 		})
 	})
@@ -70,7 +72,6 @@ func (app *application) mount() *chi.Mux {
 }
 
 func (app *application) run(mux *chi.Mux) error {
-
 	srv := &http.Server{
 		Addr:         app.config.addr,
 		Handler:      mux,
@@ -78,8 +79,6 @@ func (app *application) run(mux *chi.Mux) error {
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,
 	}
-
-	log.Printf("Starting server on %s", app.config.addr)
 
 	return srv.ListenAndServe()
 }

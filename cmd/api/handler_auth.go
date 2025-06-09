@@ -2,95 +2,55 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
-	"reloop-backend/internal/models"
-	"time"
-
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
+	"reloop-backend/internal/dto"
+	"reloop-backend/internal/views"
 )
 
-type RegisterUserInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	UserName string `json:"userName"`
-}
-
-type LoginUserInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
-	var input RegisterUserInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Request Body tidak valid", http.StatusBadRequest)
+	var req dto.RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		views.WriteErrorResponse(w, http.StatusBadRequest, views.ErrCodeValidationFailed, "Invalid request body", err.Error())
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), 12)
+	user, err := app.store.Facades.Auth.Register(r.Context(), req)
 	if err != nil {
-		http.Error(w, "Gagal memproses password", http.StatusInternalServerError)
+		views.WriteErrorResponse(w, http.StatusBadRequest, views.ErrCodeValidationFailed, "Registration failed", err.Error())
 		return
 	}
 
-	user := &models.User{
-		Email:        input.Email,
-		PasswordHash: string(hashedPassword),
-		UserName:     input.UserName,
-	}
-
-	if err := app.store.Users.Create(r.Context(), user); err != nil {
-		http.Error(w, "Gagal membuat user", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "User berhasil dibuat"})
+	views.WriteCreatedResponse(w, "User registered successfully", user)
 }
 
 func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request) {
-	var input LoginUserInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Request Body tidak valid", http.StatusBadRequest)
+	var req dto.LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		views.WriteErrorResponse(w, http.StatusBadRequest, views.ErrCodeValidationFailed, "Invalid request body", err.Error())
 		return
 	}
 
-	// ✅ FIX: Gunakan interface method langsung tanpa type assertion
-	user, err := app.store.Users.GetByEmail(r.Context(), input.Email)
+	response, err := app.store.Facades.Auth.Login(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			http.Error(w, "Email atau password salah", http.StatusUnauthorized)
-			return
-		}
-		http.Error(w, "Terjadi kesalahan server", http.StatusInternalServerError)
+		views.WriteErrorResponse(w, http.StatusUnauthorized, views.ErrCodeInvalidCredentials, "Login failed", err.Error())
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password))
+	views.WriteSuccessResponse(w, "Login successful", response)
+}
+
+func (app *application) getUserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(userContextKey).(uint)
+	if !ok {
+		views.WriteErrorResponse(w, http.StatusInternalServerError, views.ErrCodeInternalError, "Failed to get user from context", "")
+		return
+	}
+
+	user, err := app.store.Facades.Auth.GetProfile(r.Context(), userID)
 	if err != nil {
-		http.Error(w, "Email atau password salah", http.StatusUnauthorized)
+		views.WriteErrorResponse(w, http.StatusNotFound, views.ErrCodeUserNotFound, "User not found", err.Error())
 		return
 	}
 
-	claims := jwt.MapClaims{
-		"sub": user.ID,
-		"rol": user.Role,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Tandatangani token dengan secret key
-	tokenString, err := token.SignedString([]byte(app.config.jwtSecret))
-	if err != nil {
-		http.Error(w, "Gagal membuat token", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+	views.WriteSuccessResponse(w, "Profile retrieved successfully", user)
 }
