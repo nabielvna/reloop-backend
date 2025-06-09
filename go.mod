@@ -4,12 +4,14 @@ go 1.24.4
 
 require (
 	github.com/go-chi/chi/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/joho/godotenv v1.5.1
-	gorm.io/driver/postgres v1.6.0
+	github.com/lib/pq v1.10.9
+	golang.org/x/crypto v0.39.0
+	gorm.io/driver/sqlite v1.5.6  // Add SQLite driver
 	gorm.io/gorm v1.30.0
+	gorm.io/driver/postgres v1.6.0  // Keep PostgreSQL for production
 )
-
-require github.com/golang-jwt/jwt/v5 v5.2.2
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -18,8 +20,7 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/lib/pq v1.10.9
-	golang.org/x/crypto v0.39.0
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 )

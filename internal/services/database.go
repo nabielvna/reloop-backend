@@ -18,9 +18,9 @@ var (
 
 func GetDatabase() *DatabaseManager {
 	once.Do(func() {
-		// Menggunakan config yang sama dari main.go
+		// SQLite database file
 		database, err := db.New(
-			"postgres://postgres:1234@localhost:5432/reloop?sslmode=disable",
+			"./database/reloop.db", // SQLite file path
 			30, 30, "15m",
 		)
 		if err != nil {
