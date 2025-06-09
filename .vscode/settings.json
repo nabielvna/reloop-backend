@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "Reloop PostgreSQL",
+            "database": "reloop",
+            "username": "postgres",
+            "password": "rafael2005"
+        }
+    ]
+}

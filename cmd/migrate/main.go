@@ -234,9 +234,9 @@ func seedItems(db *gorm.DB) {
 		var existing models.Item
 		if err := db.Where("name = ? AND seller_id = ?", item.Name, item.SellerID).First(&existing).Error; err == gorm.ErrRecordNotFound {
 			if err := db.Create(&item).Error; err != nil {
-				log.Printf("❌ Failed to create item %s: %v", item.Name, err)
+				log.Printf(" Failed to create item %s: %v", item.Name, err)
 			} else {
-				log.Printf("✅ Created item: %s (Rp %.0f)", item.Name, item.Price)
+				log.Printf("reated item: %s (Rp %.0f)", item.Name, item.Price)
 			}
 		} else {
 			log.Printf("⏭️  Item already exists: %s", item.Name)

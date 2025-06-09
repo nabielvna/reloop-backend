@@ -24,7 +24,7 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  .env file tidak ditemukan, lanjut dengan env vars sistem atau fallback")
+		log.Println(" .env file tidak ditemukan, lanjut dengan env vars sistem atau fallback")
 	}
 
 	cfg := config{
@@ -59,7 +59,6 @@ func main() {
 	log.Println("Koneksi ke database berhasil")
 
 	store := store.NewStorage(db, cfg.jwtSecret)
-
 	app := &application{
 		config: cfg,
 		store:  store,
@@ -67,5 +66,6 @@ func main() {
 
 	log.Printf("Menjalankan server di %s", cfg.addr)
 	mux := app.mount()
+	log.Printf("🚀 Server starting on %s", cfg.addr)
 	log.Fatal(app.run(mux))
 }

@@ -27,6 +27,7 @@ func GetDatabase(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime string)
 		if err != nil {
 			panic("Failed to connect to database: " + err.Error())
 		}
+
 		dbInstance = &DatabaseManager{db: database}
 	})
 	return dbInstance
